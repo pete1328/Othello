@@ -1,3 +1,6 @@
+![Static Badge](https://img.shields.io/badge/socket.io-client-pink)
+![GitHub file size in bytes](https://img.shields.io/github/size/pete1328/Othello/client.py)
+
 # Othello Remote Client for JAR Game Board
 Starter developed with Python 3.7.0, tested with Python 2.7.10. Current files developed/tested with Python 3.9.12 and 3.7.6
 
