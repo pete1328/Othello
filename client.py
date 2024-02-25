@@ -18,48 +18,63 @@
 #2/25 NOTES...
 # p2 remote won, TIE, TIE, lost, lost
 # p1 remote won, lost, lost, won, lost
+#^ after refactored
+# p1 remote lost, won, lost
 
-import sys
-import json
-import socket
+import sys # for python runtime env
+import json # to work with the JSON data (sent to server)
+import socket # for the network (bc this is part of a client/server application)
 
-def check_line(board, rel_loc, start_spot, player, opp):
-  print('Checking row/col/diag')
+def add_valid_spot(all_options, found_opt):
+  '''
+  GIVEN: master options list we are adding to when searching this boards opts
+  PURPOSE: add current spot we found in check_line() to master dict if it's valid
+  '''
+  # Dict fixes issue of summing up overlapping spots! (used to be list)
+  cur_key = found_opt[1] #spot
+  cur_val = found_opt[0] #pts found from that one search
+  #TEST print('results for that spot {!r} - pts:{!r}'.format(cur_key, cur_val)) 
+  if cur_val > 0: #this is a space we can play on
+    all_options.setdefault(cur_key, 0) #if spot is already an option, this line does nothing
+    all_options[cur_key] += cur_val #sum up points related to playing in that spot (may be adding to 0)
+
+def check_line(board, rel_loc, start_spot, player, opp, all_opts):
+  '''
+  PURPOSE: Looks at the corresponding row/col/diag of the cur empty adj spot to see/return possible points if played there
+    If spot is: a corner-look at the mirrored & extending diag, vertical-look at that column (down/up depending), horizontal-look at that row (R/L depending)
+  GIVEN: board, adjactent (start) spot and location relative to opp piece found, which players we vs the opponent are
+  RETURNS: None, calls funct to add to all_opt dictionary so we can collect all options before choosing which to play in get_move()
+  '''
+  #TEST print('Checking row/col/diag') 
+
+  # Initialize needed variables
   pts = 0
   pos_pts = 0 # possible points when searching along cur row/col/diag
   spot = [-1,-1]
-  valid = 0
-  # if cur_spot is a corner -- look at the mirrored & extending diag
-  # elif cur_spot is vertical -- look at that column (down or up depending)
-  # elif cur_spot is horizontal -- look at that row (go R or L depending)
   r_increment = -1*rel_loc[0] # set depending on type of line we are searching
   c_increment = -1*rel_loc[1] # set depending on type of line we are searching
-
-  # Checking line loop... spot[r,c] changings as we look WHILE r & c <= 7
   r = start_spot[0]
   c = start_spot[1]
-  #old - while ((r < 7 if (r_increment > 0) else r > 0) and (c < 7 if (c_increment >= 0) else c > 0)):
+  
+  # Checking line loop... spot[r,c] changes as we look WHILE r & c are in range of the board grid
   r+=r_increment
   c+=c_increment
   while (r >= 0 and r < 8 and c >= 0 and c < 8):
-    #old - r+=r_increment
-    #old - c+=c_increment
-    print('Looking at [{!r},{!r}]'.format(r,c))
+    print('Looking at [{!r},{!r}]'.format(r,c)) #TEST 
     spot = board[r][c]
-    if spot == opp: pos_pts+=1
-    elif spot == player:
+    if spot == opp: pos_pts+=1 #possible piece we can turn
+    elif spot == player: #valid row play! but counting stops
       pts=pos_pts
-      print('my own spot at [{!r},{!r}] so future opts don\'t matter. PTS: {!r}'.format(r,c,pts))
-      return (pts, (start_spot[0],start_spot[1]))
+      print('my own spot at [{!r},{!r}] so future opts don\'t matter. PTS: {!r}'.format(r,c,pts)) #TEST 
+      break
     else:
-      print('empty spot at [{!r},{!r}] stops opts. PTS: {!r}'.format(r,c,pts))
-      return (pts, (start_spot[0],start_spot[1])) #an empty spot
+      print('empty spot at [{!r},{!r}] stops opts. PTS: {!r}'.format(r,c,pts)) #TEST 
+      break
     r+=r_increment #new
     c+=c_increment #new
-  return (pts, (start_spot[0],start_spot[1]))
+  add_valid_spot(all_opts, (pts, (start_spot[0],start_spot[1])))
   
-def search_adjacents(board, row, col, player, opp):
-  options = [] #list of all found playable spots w/corresponding pts that would turn
+def search_adjacents(board, row, col, player, opp, all_options):
   # Loop through surrounding spots to see open potential spots, careful of edge of board
   for dr in range(-1 if (row > 0) else 0 , 2 if (row < 7) else 1):
     for dc in range(-1 if (col > 0) else 0,2 if (col < 7) else 1):
@@ -67,13 +82,9 @@ def search_adjacents(board, row, col, player, opp):
       cur_c = col+dc
       cur_spot = board[cur_r][cur_c]
       if cur_spot == 0:
-        print('found empty spot adjacent to opp at [{!r},{!r}]'.format(cur_r,cur_c))
-        pts, best_spot = check_line(board, (dr, dc), (cur_r, cur_c), player, opp)
-        print('results for that empty spot - pts:{!r}, best_spot{!r}'.format(pts, best_spot))
-        if pts != 0:
-          print('adding {!r} as an option'.format(best_spot))
-          options.append([pts, best_spot])
-  return options
+        print('found empty spot adjacent to opp at [{!r},{!r}]'.format(cur_r,cur_c)) #TEST 
+        check_line(board, (dr, dc), (cur_r, cur_c), player, opp, all_options)
+        #TEST print('results for that empty spot - pts:{!r}, best_spot{!r}'.format(pts, best_spot))
 
 def get_move(player, board):
   '''
@@ -87,27 +98,16 @@ def get_move(player, board):
   # Loop through grid board # TODO simplify loop bc rn spots will overlap/options will be redundant
   for r in range(8):
     for c in range(8):
-      # if found an opponents piece, see if I could place any piece to turn it
+      # if found an opponents piece, check adjacent spot where I can potentially play
       if board[r][c] == opp:
-        print('found opponents piece at [{!r},{!r}]'.format(r,c)) #CHECK 
-        cur_options = search_adjacents(board, r, c, player, opp) #cur_options: [[pts, spot]]
-        for opt in cur_options:
-          #OLD - all_options.append(opt)
-          # Dict fixes issue of summing up overlapping spots! (used to be list)
-          cur_key = opt[1] #spot
-          cur_val = opt[0] #pts found from that one search
-          all_options.setdefault(cur_key, 0) #if spot is already an option, this line does nothing
-          all_options[cur_key] += cur_val #sum up points related to playing in that spot (may be adding to 0)
-          # if cur_key in all_options: OLD
-          #   all_options[cur_key] += cur_val
-          # else: all_options[cur_key] = cur_val
-
+        print('found opponents piece at [{!r},{!r}]'.format(r,c)) #TEST  
+        search_adjacents(board, r, c, player, opp, all_options) #cur_options: [[pts, spot]]
   # TODO determine best move
   best_opt = (-1,-1) #default TODO what to send to pass the turn
-  print('Found options: {!r}'.format(all_options))
-  if len(all_options) != 0:
-    best_opt = max(all_options, key=all_options.get)
-  print('Best Opt: {!r}'.format(best_opt)) #returns the key (spot) in this dict that has the highest value (pts)
+  print('Found options: {!r}'.format(all_options)) #TEST 
+  if len(all_options) != 0: # just incase
+    best_opt = max(all_options, key=all_options.get) #returns the key (spot) in this dict that has the highest value (pts)
+  print('Best Opt: {!r}'.format(best_opt)) #TEST 
   return [best_opt[0],best_opt[1]] #formatting to a list for sending
 
 
