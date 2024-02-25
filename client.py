@@ -1,25 +1,5 @@
-#!/usr/bin/python
-
 # Abby Peterson, 02/21/24
 # Othello remote player for Atomic Object JAR game board
-
-#2/22 NOTES ...
-# both remote, p2 "always" wins (4 tries so far)
-# against random (games so far)
-#   p1 remote won
-#   p2 remote lost
-#   p2 remote won
-#   p1 remote TIE
-#   p1 remote won
-#2/24 NOTES...
-# both remote, p1 wins (4 tries so far)
-# p1 remote lost, won, lost
-# p2 remote lost, won, won
-#2/25 NOTES...
-# p2 remote won, TIE, TIE, lost, lost
-# p1 remote won, lost, lost, won, lost
-#^ after refactored
-# p1 remote lost, won, lost
 
 import sys # for python runtime env
 import json # to work with the JSON data (sent to server)
@@ -30,7 +10,6 @@ def add_valid_spot(all_options, found_opt):
   GIVEN: master options list we are adding to when searching this boards opts
   PURPOSE: add current spot we found in check_line() to master dict if it's valid
   '''
-  # Dict fixes issue of summing up overlapping spots! (used to be list)
   cur_key = found_opt[1] #spot
   cur_val = found_opt[0] #pts found from that one search
   #TEST print('results for that spot {!r} - pts:{!r}'.format(cur_key, cur_val)) 
@@ -46,7 +25,6 @@ def check_line(board, rel_loc, start_spot, player, opp, all_opts):
   RETURNS: None, calls funct to add to all_opt dictionary so we can collect all options before choosing which to play in get_move()
   '''
   #TEST print('Checking row/col/diag') 
-
   # Initialize needed variables
   pts = 0
   pos_pts = 0 # possible points when searching along cur row/col/diag
@@ -60,15 +38,14 @@ def check_line(board, rel_loc, start_spot, player, opp, all_opts):
   r+=r_increment
   c+=c_increment
   while (r >= 0 and r < 8 and c >= 0 and c < 8):
-    print('Looking at [{!r},{!r}]'.format(r,c)) #TEST 
+    #TEST print('Looking at [{!r},{!r}]'.format(r,c)) 
     spot = board[r][c]
     if spot == opp: pos_pts+=1 #possible piece we can turn
-    elif spot == player: #valid row play! but counting stops
-      pts=pos_pts
-      print('my own spot at [{!r},{!r}] so future opts don\'t matter. PTS: {!r}'.format(r,c,pts)) #TEST 
-      break
     else:
-      print('empty spot at [{!r},{!r}] stops opts. PTS: {!r}'.format(r,c,pts)) #TEST 
+      if spot == player: #valid row play! but counting stops
+        pts=pos_pts
+        #TEST print('my own spot at [{!r},{!r}] so future opts don\'t matter. PTS: {!r}'.format(r,c,pts)) 
+      #else: #TEST print('empty spot at [{!r},{!r}] stops opts. PTS: {!r}'.format(r,c,pts)) 
       break
     r+=r_increment #new
     c+=c_increment #new
@@ -81,8 +58,8 @@ def search_adjacents(board, row, col, player, opp, all_options):
       cur_r = row+dr
       cur_c = col+dc
       cur_spot = board[cur_r][cur_c]
-      if cur_spot == 0:
-        print('found empty spot adjacent to opp at [{!r},{!r}]'.format(cur_r,cur_c)) #TEST 
+      if cur_spot == 0: # found empty spot adjacent to opp
+        #TEST print('found empty spot adjacent to opp at [{!r},{!r}]'.format(cur_r,cur_c))  
         check_line(board, (dr, dc), (cur_r, cur_c), player, opp, all_options)
         #TEST print('results for that empty spot - pts:{!r}, best_spot{!r}'.format(pts, best_spot))
 
@@ -93,21 +70,23 @@ def get_move(player, board):
   '''
   opp = 1 # opponents player #
   if player == 1: opp = 2
-  all_options = {} #key: spot, value: points
+  all_options = {} #key: spot, value: points - dict fixes issue of summing up overlapping spots! (used to be a list)
+
   # Determine valid moves...
   # Loop through grid board # TODO simplify loop bc rn spots will overlap/options will be redundant
   for r in range(8):
     for c in range(8):
       # if found an opponents piece, check adjacent spot where I can potentially play
       if board[r][c] == opp:
-        print('found opponents piece at [{!r},{!r}]'.format(r,c)) #TEST  
+        #TEST print('found opponents piece at [{!r},{!r}]'.format(r,c))  
         search_adjacents(board, r, c, player, opp, all_options) #cur_options: [[pts, spot]]
+  
   # TODO determine best move
-  best_opt = (-1,-1) #default TODO what to send to pass the turn
-  print('Found options: {!r}'.format(all_options)) #TEST 
+  best_opt = (-1,-1) #default invalid
+  #TEST print('Found options: {!r}'.format(all_options)) 
   if len(all_options) != 0: # just incase
     best_opt = max(all_options, key=all_options.get) #returns the key (spot) in this dict that has the highest value (pts)
-  print('Best Opt: {!r}'.format(best_opt)) #TEST 
+  #TEST print('Best Opt: {!r}'.format(best_opt)) 
   return [best_opt[0],best_opt[1]] #formatting to a list for sending
 
 
