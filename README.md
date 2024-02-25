@@ -1,5 +1,5 @@
-# Python 3 Starter
-Starter developed with Python 3.7.0, tested with Python 2.7.10. Further developed/tested with Python 3.9.12 and 3.7.6 
+# Othello Remote Client for JAR Game Board
+Starter developed with Python 3.7.0, tested with Python 2.7.10. Current files developed/tested with Python 3.9.12 and 3.7.6
 
 ## Instructions
 To run the client, run: `python client.py [optional port] [optional hostname]`
