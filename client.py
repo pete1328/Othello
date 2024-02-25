@@ -99,6 +99,17 @@ def prepare_response(move):
   print('sending {!r}'.format(response))
   return response
 
+def get_game_result(p, board):
+  p1_spots = sum(row.count(1) for row in board)
+  p2_spots = sum(row.count(2) for row in board)
+  if p1_spots+p2_spots < 64:
+    print('NOTE: game may have ended early')
+  if (p1_spots > p2_spots and p == 1) or (p2_spots > p1_spots and p == 2):
+    return "won"
+  elif p1_spots == p2_spots:
+    return "tied"
+  return "lost"
+
 if __name__ == "__main__":
   port = int(sys.argv[1]) if (len(sys.argv) > 1 and sys.argv[1]) else 1337 # defining port num (for client server to connect)
   host = sys.argv[2] if (len(sys.argv) > 2 and sys.argv[2]) else socket.gethostname() # defining local host port num
@@ -110,6 +121,8 @@ if __name__ == "__main__":
       data = sock.recv(1024)
       if not data:
         print('connection to server closed')
+        result = get_game_result(player, board) #analyze the final board sent to see who likely won
+        print('Game Over: Player:{!r}: {!r}'.format(player, result)) # for testOdds file
         break
       json_data = json.loads(str(data.decode('UTF-8'))) # Ex. `{"board":<[8x8]>,"maxTurnTime":15000,"player":1}\n`
       board = json_data['board'] # Ex.[[0,0,0,0,0,0,0,0],[0,0,0,0,2,0,0,0],[0,0,0,0,2,0,0,0],[0,0,0,1,2,0,0,0],[0,0,0,1,2,2,0,0],[0,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]
