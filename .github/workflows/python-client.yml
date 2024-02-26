@@ -35,3 +35,12 @@ jobs:
     - name: Lint with pylint
       run: |
         pylint client.py
+
+    - name: Run tests and collect coverage
+      run: |
+        (sleep 2; python3 -m pytest tests.py) & (coverage run -m pytest client.py ) coverage xml
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: 786138ec-53a8-4e0d-bb21-752560601756
+        slug: pete1328/Othello
