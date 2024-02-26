@@ -42,5 +42,5 @@ jobs:
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
-        token: 786138ec-53a8-4e0d-bb21-752560601756
+        token: ${{ secrets.CODECOV_TOKEN }}
         slug: pete1328/Othello
