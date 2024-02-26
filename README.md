@@ -10,7 +10,7 @@
 
 
 # Othello Remote Client for JAR Game Board
-Starter code developed with Python 3.7.0, tested with Python 2.7.10. Current files developed/tested with Python 3.9.12 and 3.7.6. All of the above should work but I primarily run in a Python 3.9.12 environment.
+Starter code developed with Python 3.7.0, tested with Python 2.7.10. Current files developed/tested with Python 3.9.12 and 3.7.6. Feel free to try any of the above, but I primarily run in a Python 3.9.12 environment.
 
 ## Instructions
 This client is compatable with a JAR Othello game board (file not attached). So, if you have access to said game board, start it up and...
@@ -25,7 +25,7 @@ To run the test_get_move_returns_a_valid_move test case in the TestGetMove class
 To run the test file that initiaties and tracks the results of 100 games, make sure the board server is started and run `python testOdds.py`
 
 ## Information
-Client file developed by a 22 year old computer science graduate as part of a job application process. This main client program simulates a basic player that analyzes and chooses it's next move based on the current Othello game board. As of now, it is at an average win rate of 70.5 % (out of 400 games, with a mix of competing as player 1 or 2 against a random strategied opponent).
+Client file developed by a computer science graduate as part of a job application process. This main client program simulates a basic player that analyzes and chooses it's next move based on the current Othello game board. As of now, it is at an average win rate of 70.5 % (out of 400 games, with a mix of competing as player 1 or 2 against a random strategied opponent).
 
 ## Recommended Software
 * Python 3.7 or 3.9
