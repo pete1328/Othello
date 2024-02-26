@@ -90,7 +90,7 @@ def get_move(player, board):
         for c in range(8):
             # if found an opponents piece, check adjacent spot where I can potentially play
             if board[r][c] == opp:
-                search_adjacents(board, r, c, (player, opp), all_options) #cur_options: [[pts, spot]]
+                search_adjacents(board, r, c, (player, opp), all_options)
 
     # Now determine best move - greedy strat
     best_opt = (-1,-1) #default invalid
@@ -134,13 +134,13 @@ if __name__ == "__main__":
     try:
         sock.connect((host, port))
         while True:
-            data = sock.recv(1024)
+            data = sock.recv(1024) # Ex. `{"board":[[]],"maxTurnTime":15000,"player":1}\n`
             if not data:
                 print('connection to server closed')
                 status = get_game_result(player, board)
                 print(f"Game Over: Player:{player}: {status}") # for testOdds file
                 break
-            json_data = json.loads(str(data.decode('UTF-8'))) #`{"board":[],"maxTurnTime":#,"player":1}\n`
+            json_data = json.loads(str(data.decode('UTF-8')))
             board = json_data['board']
             maxTurnTime = json_data['maxTurnTime']
             player = json_data['player'] # can be set in terminal command, but never assume val
