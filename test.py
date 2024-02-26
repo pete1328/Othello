@@ -34,6 +34,14 @@ class TestErrorCausingBoards(unittest.TestCase):
     self.assertEqual(client.get_move(player, board), [3,0])
     #NOTE: had to fix check_line while loop now that we add to opts instead of returning sub_opts list
 
+class TestGameResultCalc(unittest.TestCase):
+  def test_game_result_calc(self):
+    player = 1
+    board = [[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1]]
+    self.assertEqual(client.get_game_result(player, board), "won")
+    player = 2
+    self.assertEqual(client.get_game_result(player, board), "lost")
+
 class TestPrepareResponse(unittest.TestCase):
   def test_prepare_response_returns_a_valid_response(self):
     self.assertEqual(client.prepare_response([2, 3]), b'[2, 3]\n')
