@@ -5,6 +5,7 @@
 ![Lines of code](https://tokei.rs/b1/github/pete1328/Othello?color=purple&style=flat)
 [![pylint](https://img.shields.io/badge/PyLint-8.80-brightgreen?logo=python&logoColor=white)
 [![GitHub Workflow Status](https://github.com/pete1328/Othello/actions/workflows/python-client.yml/badge.svg)](https://github.com/pete1328/Othello/actions/workflows/python-client.yml)
+[![codecov](https://codecov.io/gh/pete1328/Othello/branch/main/graph/badge.svg)](https://codecov.io/gh/pete1328/Othello)
 ![GitHub watchers](https://img.shields.io/github/watchers/pete1328/Othello)
 
 
