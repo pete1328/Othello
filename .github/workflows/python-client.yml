@@ -29,3 +29,13 @@ jobs:
     - name: Lint with pylint
       run: |
         pylint client.py
+
+    - uses: Silleellie/pylint-github-action@v2
+      with:
+        lint-path: |
+          client.py
+          test.py
+          testOdds.py
+        python-version: 3.9
+        color-good-score: brightgreen
+        color-perfect-score: brightgreen
