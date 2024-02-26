@@ -1,7 +1,13 @@
 '''
-File name & info - Othello remote player for Atomic Object JAR game board
+Othello remote player for Atomic Object JAR game board
 By Abby Peterson, 02/21/24
 Functions:
+    add_valid_spot() - adds current option to master dictionary if valid
+    check_line() - looks at corresponding line of found possible play spot
+    search_adjacents() - finds possible play spots next to opponent pieces
+    get_move() - searches board and starts funct call^ to dive into all options
+    prepare_response() - properly formats chosen spot to send play to server
+    get_game_result() - analyzes the final board sent for a winning-odds test file
 '''
 import sys # for python runtime env
 import json # to work with the JSON data (sent to server)
@@ -14,7 +20,6 @@ def add_valid_spot(all_options, found_opt):
     '''
     cur_key = found_opt[1] #spot
     cur_val = found_opt[0] #pts found from that one search
-    #TEST print('results for that spot {!r} - pts:{!r}'.format(cur_key, cur_val))
     if cur_val > 0: #this is a space we can play on
         all_options.setdefault(cur_key, 0) #if spot is already an option, this line does nothing
         all_options[cur_key] += cur_val #sum up possible points (may be adding to 0)
@@ -27,7 +32,6 @@ def check_line(board, rel_loc, start_spot, players, all_opts):
     GIVEN: board, adjactent (start) spot and location relative to opp piece found, player and opp #
     RETURNS: None, calls funct to add to all_opt dictionary before choosing which opt in get_move()
     '''
-    #TEST print('Checking row/col/diag')
     # Initialize needed variables
     pts = 0
     pos_pts = 0 # possible points when searching along cur row/col/diag
@@ -43,35 +47,32 @@ def check_line(board, rel_loc, start_spot, players, all_opts):
     r+=r_increment
     c+=c_increment
     while 0 <= r < 8 and 0 <= c < 8:
-        #TEST print('Looking at [{!r},{!r}]'.format(r,c))
         spot = board[r][c]
         if spot == opp:
             pos_pts+=1 #possible piece we can turn
         else:
             if spot == player: #valid row play! but counting stops
                 pts=pos_pts
-                #print('mine at [{!r},{!r}] future opts don\'t matter. PTS:{!r}'.format(r,c,pts))
-            #else: #TEST print('empty spot at [{!r},{!r}] stops opts. PTS: {!r}'.format(r,c,pts))
             break
         r+=r_increment #new
         c+=c_increment #new
     add_valid_spot(all_opts, (pts, (start_spot[0],start_spot[1])))
 
-def search_adjacents(board, row, col, player, opp, all_options):
+def search_adjacents(board, row, col, players, all_options):
     '''
     PURPOSE:
     GIVEN:
     '''
     # Loop through surrounding spots to see open potential spots, careful of edge of board
+    player = players[0]
+    opp = players[1]
     for dr in range(-1 if (row > 0) else 0 , 2 if (row < 7) else 1):
         for dc in range(-1 if (col > 0) else 0,2 if (col < 7) else 1):
             cur_r = row+dr
             cur_c = col+dc
             cur_spot = board[cur_r][cur_c]
             if cur_spot == 0: # found empty spot adjacent to opp
-                #TEST print('found empty spot adjacent to opp at [{!r},{!r}]'.format(cur_r,cur_c))
                 check_line(board, (dr, dc), (cur_r, cur_c), (player, opp), all_options)
-                #print('results for empty spot - pts:{!r}, best_spot{!r}'.format(pts, best_spot))
 
 def get_move(player, board):
     '''
@@ -89,17 +90,13 @@ def get_move(player, board):
         for c in range(8):
             # if found an opponents piece, check adjacent spot where I can potentially play
             if board[r][c] == opp:
-                #TEST print('found opponents piece at [{!r},{!r}]'.format(r,c))
-                search_adjacents(board, r, c, player, opp, all_options) #cur_options: [[pts, spot]]
+                search_adjacents(board, r, c, (player, opp), all_options) #cur_options: [[pts, spot]]
 
-    # TODO determine best move
+    # Now determine best move - greedy strat
     best_opt = (-1,-1) #default invalid
-    #TEST print('Found options: {!r}'.format(all_options))
     if len(all_options) != 0: # just incase
-        best_opt = max(all_options, key=all_options.get) #returns key in dict w/the highest val (pts)
-    #TEST print('Best Opt: {!r}'.format(best_opt))
+        best_opt = max(all_options, key=all_options.get) #returns dict key w/ highest val (pts)
     return [best_opt[0],best_opt[1]] #formatting to a list for sending
-
 
 def prepare_response(move):
     '''
@@ -131,9 +128,9 @@ if __name__ == "__main__":
     player = 0
 
     port = int(sys.argv[1]) if (len(sys.argv) > 1 and sys.argv[1]) else 1337 # defining port num
-    host = sys.argv[2] if (len(sys.argv) > 2 and sys.argv[2]) else socket.gethostname() # establish host
+    host = sys.argv[2] if (len(sys.argv) > 2 and sys.argv[2]) else socket.gethostname() # host""
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # initializing socket for connection
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # initializes socket for connection
     try:
         sock.connect((host, port))
         while True:

@@ -5,6 +5,8 @@ import time
 #   70% as p1 out of 10
 #   71% as p1 out of 100
 #   66% as p2 out of 100
+#   69.35% p2 out of 310
+#   70% as p1 out of 120
 
 def best_of_100_games():
     port = '1338' # or 1337
