@@ -22,7 +22,7 @@ To run all tests in "test.py" tests, run `python -m unittest test`
 To run the TestGetMove class in "test.py", run `python -m unittest test.TestGetMove`
 To run the test_get_move_returns_a_valid_move test case in the TestGetMove class in "test.py", run `python -m unittest test.TestGetMove.test_get_move_returns_a_valid_move`
 
-To run the test file that initiaties and tracks the results of 100 games, make sure the board server is started and run `python testOdds.py`
+To run the test file that initiaties and tracks the results of 100 games, make sure the board server is started. Then set `port` on line 12 in testOdds.py depending on which player is the remote client, and finally run `python testOdds.py`
 
 ## Information
 Client file developed by a computer science graduate as part of a job application process. This main client program simulates a basic player that analyzes and chooses it's next move based on the current Othello game board. As of now, it is at an average win rate of 70.5 % (out of 400 games, with a mix of competing as player 1 or 2 against a random strategied opponent).
