@@ -38,7 +38,7 @@ jobs:
 
     - name: Run tests and collect coverage
       run: |
-        (python3 -m unittest test.py) & (coverage run -m unittest client.py) && coverage xml
+        coverage run -m unittest test.py client.py & (sleep 3; coverage xml)
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
