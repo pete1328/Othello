@@ -122,7 +122,7 @@ if __name__ == "__main__":
       if not data:
         print('connection to server closed')
         result = get_game_result(player, board) #analyze the final board sent to see who likely won
-        print('Game Over: Player:{!r}: {!r}'.format(player, result)) # for testOdds file
+        print('Game Over: Player:{!r}: {}'.format(player, result)) # for testOdds file
         break
       json_data = json.loads(str(data.decode('UTF-8'))) # Ex. `{"board":<[8x8]>,"maxTurnTime":15000,"player":1}\n`
       board = json_data['board'] # Ex.[[0,0,0,0,0,0,0,0],[0,0,0,0,2,0,0,0],[0,0,0,0,2,0,0,0],[0,0,0,1,2,0,0,0],[0,0,0,1,2,2,0,0],[0,0,0,1,0,0,0,0],[0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0]]

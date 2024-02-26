@@ -6,20 +6,28 @@ def best_of_100_games():
     player = 0 #default
     remote_player_wins = 0
     ties = 0
-    for ctr in range(0,100):
+    for ctr in range(0,10):
         time.sleep(5) # waits 5 seconds
+        print('NEW Game Starting!...')
         result = subprocess.run(['python', 'client.py', port], capture_output=True, text=True) # connects to gameboard server to play game
         output_lines = result.stdout.split('\n')
         for line in output_lines:
             if line.startswith("Game Over:"):
+                print('LINE: {}'.format(line))
                 info = line.split(":")[2:] # [player, result]
                 player = info[0].strip()
-                if info[1].strip() == "won":
+                result = info[1].strip()
+                if result == "won":
+                    print('P{!r} won!'.format(player))
                     remote_player_wins += 1
-                elif info[1].strip() == "tied":
+                elif result == "tied":
+                    print('P{!r} tied!'.format(player))
                     ties += 1
+                else:
+                    print('P{!r} lost.'.format(player))
     return ctr, player, remote_player_wins, ties
 
 if __name__ == "__main__":
     ctr, player, total_wins, total_ties = best_of_100_games()
-    print('Player {!r} won: {!r}/{!r} and tied: {!r}/{!r}'.format(player, total_wins, ctr, total_ties, ctr))
+    print('Player {!r} won: {!r}/{!r} and tied: {!r}/{!r}'.format(player, total_wins, ctr+1, total_ties, ctr+1))
+    print('WIN PERCENTAGE: {}'.format(total_wins/(ctr+1)))
