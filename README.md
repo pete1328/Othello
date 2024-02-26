@@ -4,7 +4,7 @@
 ![GitHub file size in bytes](https://img.shields.io/github/size/pete1328/Othello/client.py?color=purple)
 ![Lines of code](https://tokei.rs/b1/github/pete1328/Othello?style=flat)
 [![GitHub Workflow Status](https://github.com/pete1328/Othello/actions/workflows/python-client.yml/badge.svg)](https://github.com/pete1328/Othello/actions/workflows/python-client.yml)
-[![pylint](https://img.shields.io/badge/PyLint-7.50-orange?logo=python&logoColor=white)
+[![pylint](https://img.shields.io/badge/PyLint-8.22-brightgreen?logo=python&logoColor=white)
 ![GitHub watchers](https://img.shields.io/github/watchers/pete1328/Othello)
 
 
