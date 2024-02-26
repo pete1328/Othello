@@ -29,14 +29,14 @@ def check_line(game_board, rel_loc, start_spot, players, all_opts):
     PURPOSE: Checks the corresponding row/col/diag of cur empty adj spot to see possible outcome
       If spot is: a corner -- look at the mirrored & extending diag,
       vertical-look at that column (down/up depending), horizontal-look at that row (R/L depending)
-    GIVEN: board, adjactent (start) spot and location relative to opp piece found, player and opp #
+    GIVEN: board, adjacent (start) spot and location relative to opp piece found, player and opp #
     RETURNS: None, calls funct to add to all_opt dictionary before choosing which opt in get_move()
     '''
     # Initialize needed variables
     pts = 0
     pos_pts = 0 # possible points when searching along cur row/col/diag
     spot = [-1,-1]
-    player = players[0]
+    my_p = players[0]
     opp = players[1]
     r_increment = -1*rel_loc[0] # set depending on type of line we are searching
     c_increment = -1*rel_loc[1] # set depending on type of line we are searching
@@ -51,7 +51,7 @@ def check_line(game_board, rel_loc, start_spot, players, all_opts):
         if spot == opp:
             pos_pts+=1 #possible piece we can turn
         else:
-            if spot == player: #valid row play! but counting stops
+            if spot == my_p: #valid row play! but counting stops
                 pts=pos_pts
             break
         r+=r_increment #new
@@ -60,12 +60,11 @@ def check_line(game_board, rel_loc, start_spot, players, all_opts):
 
 def search_adjacents(main_board, row, col, players, all_options):
     '''
-    PURPOSE:
-    GIVEN:
+    PURPOSE: Check the surrounding area for empty/playable spaces by opponents found piece
+      If empty space, call next funct to check corresponding line for possible play stats
+    GIVEN: game_board grid, row/col location of opp's piece, who's p1/2, master opts list
     '''
     # Loop through surrounding spots to see open potential spots, careful of edge of board
-    player = players[0]
-    opp = players[1]
     for dr in range(-1 if (row > 0) else 0 , 2 if (row < 7) else 1):
         for dc in range(-1 if (col > 0) else 0,2 if (col < 7) else 1):
             cur_r = row+dr
@@ -107,14 +106,14 @@ def prepare_response(chosen_move):
     print(f"sending {reformatted}")
     return reformatted
 
-def get_game_result(p, board):
+def get_game_result(p, final_board):
     '''
     PURPOSE: Analyze the final board sent to see who likely won
-    GIVEN:
-    RETURN:
+    GIVEN: p - which player we are, final_board - last JSON result sent before game ended
+    RETURN: string result of player's status based on the ending game board (won/tied/lost)
     '''
-    p1_spots = sum(row.count(1) for row in board)
-    p2_spots = sum(row.count(2) for row in board)
+    p1_spots = sum(row.count(1) for row in final_board)
+    p2_spots = sum(row.count(2) for row in final_board)
     if p1_spots+p2_spots < 64:
         print('NOTE: game may have ended early')
     if (p1_spots > p2_spots and p == 1) or (p2_spots > p1_spots and p == 2):
@@ -130,13 +129,13 @@ if __name__ == "__main__":
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # initializes socket for connection
     try:
         board = []
-        player = 0
+        player = 0 # pylint: disable=C0103
         sock.connect((host, port))
         while True:
             data = sock.recv(1024) # Ex. `{"board":[[]],"maxTurnTime":15000,"player":1}\n`
             if not data:
                 print('connection to server closed')
-                status = get_game_result(player, board)
+                status = get_game_result(player, board) # pylint: disable=C0103
                 print(f"Game Over: Player:{player}: {status}") # for testOdds file
                 break
             json_data = json.loads(str(data.decode('UTF-8')))
