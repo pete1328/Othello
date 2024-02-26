@@ -88,7 +88,7 @@ def get_move(my_player, cur_board):
     for r in range(8):
         for c in range(8):
             # if found an opponents piece, check adjacent spot where I can potentially play
-            if board[r][c] == opp:
+            if cur_board[r][c] == opp:
                 search_adjacents(cur_board, r, c, (my_player, opp), all_options)
 
     # Now determine best move - greedy strat
