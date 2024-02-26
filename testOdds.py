@@ -6,7 +6,7 @@ def best_of_100_games():
     player = 0 #default
     remote_player_wins = 0
     ties = 0
-    for ctr in range(0,10):
+    for ctr in range(0,20):
         time.sleep(5) # waits 5 seconds
         print('NEW Game Starting!...')
         result = subprocess.run(['python', 'client.py', port], capture_output=True, text=True) # connects to gameboard server to play game
@@ -30,4 +30,4 @@ def best_of_100_games():
 if __name__ == "__main__":
     ctr, player, total_wins, total_ties = best_of_100_games()
     print('Player {!r} won: {!r}/{!r} and tied: {!r}/{!r}'.format(player, total_wins, ctr+1, total_ties, ctr+1))
-    print('WIN PERCENTAGE: {}'.format(total_wins/(ctr+1)))
+    print('WIN PERCENTAGE: {}'.format(100*(total_wins/(ctr+1))))
