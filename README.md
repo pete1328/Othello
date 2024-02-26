@@ -1,10 +1,10 @@
 ![Python](https://img.shields.io/badge/python-v3.9.12-brightgreen.svg)
 ![Python](https://img.shields.io/badge/python-v3.7.6-yellow.svg)
-![Static Badge](https://img.shields.io/badge/socket.io-client-pink)
-![GitHub file size in bytes](https://img.shields.io/github/size/pete1328/Othello/client.py?color=purple)
-![Lines of code](https://tokei.rs/b1/github/pete1328/Othello?style=flat)
+![Static Badge](https://img.shields.io/badge/socket.io-client-orange)
+![GitHub file size in bytes](https://img.shields.io/github/size/pete1328/Othello/client.py?color=pink)
+![Lines of code](https://tokei.rs/b1/github/pete1328/Othello?color=purple&style=flat)
+[![pylint](https://img.shields.io/badge/PyLint-8.80-brightgreen?logo=python&logoColor=blue)
 [![GitHub Workflow Status](https://github.com/pete1328/Othello/actions/workflows/python-client.yml/badge.svg)](https://github.com/pete1328/Othello/actions/workflows/python-client.yml)
-[![pylint](https://img.shields.io/badge/PyLint-8.80-brightgreen?logo=python&logoColor=white)
 ![GitHub watchers](https://img.shields.io/github/watchers/pete1328/Othello)
 
 
