@@ -16,16 +16,16 @@ def add_valid_spot(all_options, found_opt):
     cur_val = found_opt[0] #pts found from that one search
     #TEST print('results for that spot {!r} - pts:{!r}'.format(cur_key, cur_val))
     if cur_val > 0: #this is a space we can play on
-      all_options.setdefault(cur_key, 0) #if spot is already an option, this line does nothing
-      all_options[cur_key] += cur_val #sum up points related to playing in that spot (may be adding to 0)
+        all_options.setdefault(cur_key, 0) #if spot is already an option, this line does nothing
+        all_options[cur_key] += cur_val #sum up possible points (may be adding to 0)
 
 def check_line(board, rel_loc, start_spot, player, opp, all_opts):
     '''
-    PURPOSE: Looks at the corresponding row/col/diag of the cur empty adj spot to see/return possible outcome
+    PURPOSE: Checks the corresponding row/col/diag of cur empty adj spot to see possible outcome
       If spot is: a corner -- look at the mirrored & extending diag,
       vertical-look at that column (down/up depending), horizontal-look at that row (R/L depending)
-    GIVEN: board, adjactent (start) spot and location relative to opp piece found, which players we vs the opponent are
-    RETURNS: None, calls funct to add to all_opt dictionary before choosing which to play in get_move()
+    GIVEN: board, adjactent (start) spot and location relative to opp piece found, player and opp #
+    RETURNS: None, calls funct to add to all_opt dictionary before choosing which opt in get_move()
     '''
     #TEST print('Checking row/col/diag')
     # Initialize needed variables
@@ -36,7 +36,7 @@ def check_line(board, rel_loc, start_spot, player, opp, all_opts):
     c_increment = -1*rel_loc[1] # set depending on type of line we are searching
     r = start_spot[0]
     c = start_spot[1]
-    
+
     # Checking line loop... spot[r,c] changes as we look WHILE r & c are in range of the board grid
     r+=r_increment
     c+=c_increment
@@ -54,7 +54,7 @@ def check_line(board, rel_loc, start_spot, player, opp, all_opts):
         r+=r_increment #new
         c+=c_increment #new
     add_valid_spot(all_opts, (pts, (start_spot[0],start_spot[1])))
-  
+
 def search_adjacents(board, row, col, player, opp, all_options):
     '''
     PURPOSE:
@@ -77,23 +77,24 @@ def get_move(player, board):
     RETURN: players calculated spot for next play to send -- must be valid option (add brains L8R)
     '''
     opp = 1 # opponents player #
-    if player == 1: opp = 2
-    all_options = {} #key: spot, value: points - dict fixes issue of summing up overlapping spots! (used to be a list)
+    if player == 1:
+        opp = 2
+    all_options = {} #key:spot, val:points - dict sums up overlapping spots! (> old list idea)
 
     # Determine valid moves...
-    # Loop through grid board # TODO simplify loop bc rn spots will overlap/options will be redundant
+    # Loop through grid board
     for r in range(8):
         for c in range(8):
             # if found an opponents piece, check adjacent spot where I can potentially play
             if board[r][c] == opp:
                 #TEST print('found opponents piece at [{!r},{!r}]'.format(r,c))
                 search_adjacents(board, r, c, player, opp, all_options) #cur_options: [[pts, spot]]
-    
+
     # TODO determine best move
     best_opt = (-1,-1) #default invalid
     #TEST print('Found options: {!r}'.format(all_options))
     if len(all_options) != 0: # just incase
-        best_opt = max(all_options, key=all_options.get) #returns the key (spot) in this dict that has the highest value (pts)
+        best_opt = max(all_options, key=all_options.get) #returns key in dict w/the highest val (pts)
     #TEST print('Best Opt: {!r}'.format(best_opt))
     return [best_opt[0],best_opt[1]] #formatting to a list for sending
 
@@ -103,44 +104,44 @@ def prepare_response(move):
     GIVEN: list of len 2 (x,y) for players next move
     RETURN: reformatted move as a JSON array to send as response
     '''
-    response = '{}\n'.format(move).encode() # return it as a JSON array, followed by a newline, Ex: `"[1,2]\n"`
+    response = '{}\n'.format(move).encode() # returns as a JSON array w/newline, Ex: `"[1,2]\n"`
     print('sending {!r}'.format(response))
     return response
 
 def get_game_result(p, board):
     '''
-    PURPOSE:
+    PURPOSE: Analyze the final board sent to see who likely won
     GIVEN:
     RETURN:
     '''
     p1_spots = sum(row.count(1) for row in board)
     p2_spots = sum(row.count(2) for row in board)
     if p1_spots+p2_spots < 64:
-      print('NOTE: game may have ended early')
+        print('NOTE: game may have ended early')
     if (p1_spots > p2_spots and p == 1) or (p2_spots > p1_spots and p == 2):
-      return "won"
+        return "won"
     if p1_spots == p2_spots:
-      return "tied"
+        return "tied"
     return "lost"
 
 if __name__ == "__main__":
     board = []
     player = 0
 
-    port = int(sys.argv[1]) if (len(sys.argv) > 1 and sys.argv[1]) else 1337 # defining port num (for client server to connect)
-    host = sys.argv[2] if (len(sys.argv) > 2 and sys.argv[2]) else socket.gethostname() # defining local host port num
+    port = int(sys.argv[1]) if (len(sys.argv) > 1 and sys.argv[1]) else 1337 # defining port num
+    host = sys.argv[2] if (len(sys.argv) > 2 and sys.argv[2]) else socket.gethostname() # defining host num
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # initializing socket for connection
     try:
-        sock.connect((host, port)) 
+        sock.connect((host, port))
         while True:
             data = sock.recv(1024)
             if not data:
                 print('connection to server closed')
-                status = get_game_result(player, board) #analyze the final board sent to see who likely won
+                status = get_game_result(player, board)
                 print('Game Over: Player:{!r}: {}'.format(player, status)) # for testOdds file
                 break
-            json_data = json.loads(str(data.decode('UTF-8'))) # Ex. `{"board":<[8x8]>,"maxTurnTime":15000,"player":1}\n`
+            json_data = json.loads(str(data.decode('UTF-8'))) #`{"board":[[]],"maxTurnTime":#,"player":1}\n`
             board = json_data['board']
             maxTurnTime = json_data['maxTurnTime']
             player = json_data['player'] # can be set in terminal command, but never assume val
