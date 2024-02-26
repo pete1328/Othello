@@ -1,24 +1,6 @@
 import unittest
 import client
 
-#2/22 NOTES ...
-# both remote, p2 "always" wins (4 tries so far)
-# against random (games so far)
-#   p1 remote won
-#   p2 remote lost
-#   p2 remote won
-#   p1 remote TIE
-#   p1 remote won
-#2/24 NOTES...
-# both remote, p1 wins (4 tries so far)
-# p1 remote lost, won, lost
-# p2 remote lost, won, won
-#2/25 NOTES...
-# p2 remote won, TIE, TIE, lost, lost
-# p1 remote won, lost, lost, won, lost
-#^ after refactored
-# p1 remote lost, won, lost
-
 class TestGetMove(unittest.TestCase):
   def test_get_move_returns_a_valid_move(self):
     board = [[0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 1, 0, 0, 0], [0, 0, 0, 1, 1, 0, 0, 0], [0, 0, 1, 1, 1, 0, 0, 0], [0, 0, 2, 0, 0, 0, 0, 0], [0, 0, 2, 0, 0, 0, 0, 0], [0, 0, 2, 0, 0, 0, 0, 0]]
