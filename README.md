@@ -3,6 +3,7 @@
 ![Static Badge](https://img.shields.io/badge/socket.io-client-pink)
 ![GitHub file size in bytes](https://img.shields.io/github/size/pete1328/Othello/client.py?color=purple)
 ![Lines of code](https://tokei.rs/b1/github/pete1328/Othello?style=flat)
+![pylint]()
 ![GitHub watchers](https://img.shields.io/github/watchers/pete1328/Othello)
 
 
