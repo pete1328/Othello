@@ -24,7 +24,7 @@ def add_valid_spot(all_options, found_opt):
         all_options.setdefault(cur_key, 0) #if spot is already an option, this line does nothing
         all_options[cur_key] += cur_val #sum up possible points (may be adding to 0)
 
-def check_line(board, rel_loc, start_spot, players, all_opts):
+def check_line(game_board, rel_loc, start_spot, players, all_opts):
     '''
     PURPOSE: Checks the corresponding row/col/diag of cur empty adj spot to see possible outcome
       If spot is: a corner -- look at the mirrored & extending diag,
@@ -47,7 +47,7 @@ def check_line(board, rel_loc, start_spot, players, all_opts):
     r+=r_increment
     c+=c_increment
     while 0 <= r < 8 and 0 <= c < 8:
-        spot = board[r][c]
+        spot = game_board[r][c]
         if spot == opp:
             pos_pts+=1 #possible piece we can turn
         else:
@@ -58,7 +58,7 @@ def check_line(board, rel_loc, start_spot, players, all_opts):
         c+=c_increment #new
     add_valid_spot(all_opts, (pts, (start_spot[0],start_spot[1])))
 
-def search_adjacents(board, row, col, players, all_options):
+def search_adjacents(main_board, row, col, players, all_options):
     '''
     PURPOSE:
     GIVEN:
@@ -70,17 +70,17 @@ def search_adjacents(board, row, col, players, all_options):
         for dc in range(-1 if (col > 0) else 0,2 if (col < 7) else 1):
             cur_r = row+dr
             cur_c = col+dc
-            cur_spot = board[cur_r][cur_c]
+            cur_spot = main_board[cur_r][cur_c]
             if cur_spot == 0: # found empty spot adjacent to opp
-                check_line(board, (dr, dc), (cur_r, cur_c), (player, opp), all_options)
+                check_line(main_board, (dr, dc), (cur_r, cur_c), players, all_options)
 
-def get_move(player, board):
+def get_move(my_player, cur_board):
     '''
     GIVEN: player: 1 or 2, board: list of game board rows (8x8) -- 0 empty, 1 p-1 spot, 2 p-2 spot
     RETURN: players calculated spot for next play to send -- must be valid option (add brains L8R)
     '''
     opp = 1 # opponents player
-    if player == 1:
+    if my_player == 1:
         opp = 2
     all_options = {} #key:spot, val:points - dict sums up overlapping spots! (> old list idea)
 
@@ -90,7 +90,7 @@ def get_move(player, board):
         for c in range(8):
             # if found an opponents piece, check adjacent spot where I can potentially play
             if board[r][c] == opp:
-                search_adjacents(board, r, c, (player, opp), all_options)
+                search_adjacents(cur_board, r, c, (my_player, opp), all_options)
 
     # Now determine best move - greedy strat
     best_opt = (-1,-1) #default invalid
@@ -98,14 +98,14 @@ def get_move(player, board):
         best_opt = max(all_options, key=all_options.get) #returns dict key w/ highest val (pts)
     return [best_opt[0],best_opt[1]] #formatting to a list for sending
 
-def prepare_response(move):
+def prepare_response(chosen_move):
     '''
     GIVEN: list of len 2 (x,y) for players next move
     RETURN: reformatted move as a JSON array to send as response
     '''
-    response = f"{move}\n".encode() # returns as a JSON array w/newline, Ex: `"[1,2]\n"`
-    print(f"sending {response}")
-    return response
+    reformatted = f"{chosen_move}\n".encode() # returns as a JSON array w/newline, Ex: `"[1,2]\n"`
+    print(f"sending {reformatted}")
+    return reformatted
 
 def get_game_result(p, board):
     '''
@@ -124,14 +124,13 @@ def get_game_result(p, board):
     return "lost"
 
 if __name__ == "__main__":
-    board = []
-    player = 0
-
     port = int(sys.argv[1]) if (len(sys.argv) > 1 and sys.argv[1]) else 1337 # defining port num
     host = sys.argv[2] if (len(sys.argv) > 2 and sys.argv[2]) else socket.gethostname() # host""
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # initializes socket for connection
     try:
+        board = []
+        player = 0
         sock.connect((host, port))
         while True:
             data = sock.recv(1024) # Ex. `{"board":[[]],"maxTurnTime":15000,"player":1}\n`

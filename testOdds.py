@@ -9,11 +9,11 @@ import time
 #   70% as p1 out of 120
 
 def best_of_100_games():
-    port = '1338' # or 1337
+    port = '1337' # or 1338 for p2
     player = 0 #default
     remote_player_wins = 0
     ties = 0
-    for ctr in range(0,310):
+    for ctr in range(0,100):
         time.sleep(5) # waits 5 seconds so server is ready fs
         print('NEW Game {!r} Starting!...'.format(ctr))
         result = subprocess.run(['python', 'client.py', port], capture_output=True, text=True) # connects to gameboard server to play game
